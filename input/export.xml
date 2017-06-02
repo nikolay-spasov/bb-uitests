@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!--<url>
+    <loc>http://localhost/test</loc>
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>http://localhost/fade-out</loc>
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>http://localhost/home</loc>
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>http://localhost/fade-out/fade-in</loc>
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>http://localhost/home/2017/05/30/test-news-item</loc>
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>http://localhost/home/2017/05/30/test-news-item-2</loc>
+    <priority>1</priority>
+  </url>-->
+  <url>
+    <loc>https://www.beyondblue.org.au/get-support/get-immediate-support/</loc>
+    <priority>1</priority>
+  </url>
+</urlset>
