@@ -4,28 +4,31 @@ const path = require('path');
 const xml2js = require('xml2js');
 const dateFormat = require('dateFormat');
 
+//console.log(path.join(__dirname, 'asd'));
+
 (async () => {
     let urls = await getUrls('/input/export.xml').catch(err => {
         console.log(err);  
     });
     
+    const now = dateFormat(new Date(), 'dd-mm-yyyy-hhMMss');
     let allResults = [];
     for (let i = 0; i < urls.length; i++) {
         let result = await pixelCompare.compare(
             urls[i].replace(/^https:\/\/www/, 'https://dev'),
-            urls[i])
+            urls[i],
+            now);
 
         allResults.push(result);
     }
 
-    await saveResultToFile(allResults).catch(err => { console.log(err); });
+    await saveResultToFile(allResults, now).catch(err => { console.log(err); });
 })();
 
 async function runAgainstAllUrls(pages) {
     let res = await pixelCompare.compare(
         'https://dev.beyondblue.org.au/get-support/get-immediate-support/',
         'https://www.beyondblue.org.au/get-support/get-immediate-support/')
-        //'https://google.bg', 'https://google.bg')
         .catch(err => {
             console.log(err);
         });
@@ -56,9 +59,9 @@ async function getUrls(filePath) {
     return promise;
 }
 
-async function saveResultToFile(result) {
+async function saveResultToFile(result, formattedDate) {
     let json = JSON.stringify(result);
-    let filePath = path.join(__dirname, 'output', 'result-' + dateFormat(new Date(), 'ddMMyyyy-hhmmss') + '.json')
+    let filePath = path.join(__dirname, 'output', 'result-' + formattedDate + '.json')
     return new Promise((resolve, reject) => {
         fs.writeFile(filePath, json, 'utf8', (err) => {
             if (err) {

@@ -1,0 +1,9 @@
+<div>
+    <label for="result-set">Result set name:</label>
+    <select id="result-set" 
+        ng-model="ctrl.selectedResultSet"
+        ng-change="ctrl.changeResultSet()"
+        ng-options="item as item for item in ctrl.resultSets track by item">
+    </select>
+    <div id='grid1' ui-grid="ctrl.gridOptions" class="grid"></div>
+</div>
