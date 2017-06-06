@@ -25,7 +25,15 @@
     <priority>1</priority>
   </url>-->
   <url>
-    <!--<loc>https://www.beyondblue.org.au/get-support/get-immediate-support/</loc>-->
+    <loc>https://www.beyondblue.org.au/get-support/get-immediate-support/</loc>
+    <!--<loc>https://google.bg</loc>-->
+    <priority>1</priority>
+  </url>
+  <url>
+    <loc>https://www.beyondblue.org.au/who-does-it-affect/</loc>
+    <priority>1</priority>
+  </url>
+  <url>
     <loc>https://google.bg</loc>
     <priority>1</priority>
   </url>

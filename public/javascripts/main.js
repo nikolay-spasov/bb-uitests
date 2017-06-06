@@ -1,4 +1,4 @@
-angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
+angular.module('uiTestsReportApp', ['ui.grid', 'ui.grid.pagination', 'ui.router'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state({
@@ -6,7 +6,8 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
                 templateUrl: '/javascripts/main.html',
                 controller: 'resultsGridController',
                 controllerAs: 'ctrl',
-                url: '/'
+                url: '/:setName',
+                reload: true
             })
             .state({
                 name: 'details',
@@ -18,32 +19,34 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
 
         $urlRouterProvider.otherwise('/');
     })
-    .controller('resultsGridController', ['testResultsService', '$scope', '$state', function(t, $scope, $state) {
+    .controller('resultsGridController', ['testResultsService', '$scope', '$state', '$stateParams', function(t, $scope, $state, $stateParams) {
         var ctrl = this;
         ctrl.data = [];
         ctrl.gridOptions = {
             columnDefs: [
-                { name: 'Percentage', field: 'percentage' },
-                { name: 'Test Status', field: 'testStatus' },
-                { name: 'Dev', field: 'dev', 
+                { name: 'Url', field: 'testedUrl', cellTooltip: function(row, col) { return row.entity.testedUrl; } },
+                { name: 'Percentage', field: 'percentage', maxWidth: 100, },
+                { name: 'Test Status', field: 'testStatus', maxWidth: 100, },
+                { name: 'Dev', field: 'dev',  maxWidth: 100, enableFiltering: false,
                     cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{grid.appScope.getLink(grid, row, \'dev\')}}">Dev</a></dev>' 
                 },
-                { name: 'Prod', field: 'prod',
+                { name: 'Prod', field: 'prod', maxWidth: 100, enableFiltering: false,
                     cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{grid.appScope.getLink(grid, row, \'prod\')}}">Prod</a></dev>' 
                 },
-                { name: 'Diff', field: 'diff',
+                { name: 'Diff', field: 'diff', maxWidth: 100, enableFiltering: false,
                     cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{grid.appScope.getLink(grid, row, \'diff\')}}">Diff</a></dev>' 
                 },
                 {
-                    name: 'Compare',
-                    // cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{grid.appScope.getCompareLink(grid, row)}}">Compare</a></div>' 
-                    // cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{grid.appScope.compareBtnClicked(grid, row)}}">Compare</a></div>',
-                    cellTemplate: '<div class="ui-grid-cell-contents"><button type="button" ng-click="grid.appScope.compareBtnClicked(grid, row, $event)">Compare</button></div>',
+                    name: 'Compare', maxWidth: 100,
+                    cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="details({id: grid.appScope.getDetailUrl(grid, row)})">View</a></div>',
                     enableFiltering: false
                 }
             ],
             enableFiltering: true,
             enableSorting: true,
+            enablePaginationControls: true,
+            paginationPageSizes: [25, 50, 75],
+            paginationPageSize: 25,
             resizable: true,
             data: ctrl.data
         };
@@ -64,26 +67,28 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
             return link;
         }
 
-        $scope.compareBtnClicked = function(grid, row, $event) {
-            console.log($event);
-            $event.preventDefault();
-
+        $scope.getDetailUrl = function(grid, row) {
             var link = row.entity['prodPath'];
             link = link.replace(/^public\/images\/screenshots\//, '');
             link = link.replace(/\/prod.png$/, '');
-            console.log('asdasdasd');
 
-            $state.go('details', { id: link});
-            //$state.go('details', { id: link });
+            return link;
         }
         
         t.getResultSets().then(function (res) {
             ctrl.resultSets = res.data;
-            ctrl.selectedResultSet = res.data[0];
+            if (!$stateParams.setName) {
+                ctrl.selectedResultSet = res.data[0];
+            } else {
+                ctrl.selectedResultSet = res.data.find(function(val, index) {
+                    if (val === $stateParams.setName) return res.data[index];
+                });
+            }
         }).then(updateResultdata);
 
         this.changeResultSet = function() {
             updateResultdata();
+            $state.go('home', { setName: ctrl.selectedResultSet });
         };
 
         function updateResultdata() {
@@ -93,20 +98,18 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
         }
     }])
     .controller('detailsController', ['$stateParams', function($stateParams) {
-        const ctrl = this;
+        var ctrl = this;
 
         ctrl.getImageLink = function() {
             var current = $stateParams.id;
-            console.log(current);
             return 'images/screenshots/' + current; 
         }
-
     }])
     .service('testResultsService', ['$q', '$http', function ($q, $http) {
         this.getData = function (resultSetName) {
             var deferred = $q.defer();
 
-            $http.get('/results/' + resultSetName + '/asd').then(function (data) {
+            $http.get('/results/get/' + resultSetName).then(function (data) {
                 deferred.resolve(data);
             }).catch(function(err) {
                 deferred.reject(err);  
@@ -118,7 +121,7 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.router'])
         this.getResultSets = function () {
             var deferred = $q.defer();
 
-            $http.get('/results/sets').then(function (data) {
+            $http.get('/results/all-sets').then(function (data) {
                 deferred.resolve(data);
             }).catch(function(err) {
                 deferred.reject(err);  

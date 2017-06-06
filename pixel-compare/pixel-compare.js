@@ -36,14 +36,11 @@ async function takeScreenshot(url, filename) {
     await driver.quit();
 }
 
-async function compare(urlDev, urlProd, formattedDate) {
+async function compare(urlDev, urlProd, successTreshold, formattedDate) {
     const dirname = createTestNameFromUrl(urlDev, formattedDate);
     const dev = path.join(dirname, 'dev.png');
     const prod = path.join(dirname, 'prod.png');
     const diff = path.join(dirname, 'diff.png');
-    console.log(dev);
-    console.log(prod);
-    console.log(diff);
 
     await takeScreenshot(urlDev, dev).catch(err => {
         console.log(err);
@@ -65,7 +62,7 @@ async function compare(urlDev, urlProd, formattedDate) {
             devPath: filePathToRelativeUrl(dev),
             diffPath: filePathToRelativeUrl(diff),
             testedUrl: urlProd,
-            testStatus: result.percentage > 0.3
+            testStatus: result.percentage < successTreshold
         };
 
         resolve(returnVal);

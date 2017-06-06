@@ -5,5 +5,5 @@
         ng-change="ctrl.changeResultSet()"
         ng-options="item as item for item in ctrl.resultSets track by item">
     </select>
-    <div id='grid1' ui-grid="ctrl.gridOptions" class="grid"></div>
+    <div id='grid1' ui-grid-pagination ui-grid="ctrl.gridOptions" class="grid"></div>
 </div>

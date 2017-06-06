@@ -1,10 +1,10 @@
-const pixelCompare = require('./pixel-compare/pixel-compare');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
 const dateFormat = require('dateFormat');
 
-//console.log(path.join(__dirname, 'asd'));
+const pixelCompare = require('./pixel-compare/pixel-compare');
+const tranform = require('./url-tranform').transfom;
 
 (async () => {
     let urls = await getUrls('/input/export.xml').catch(err => {
@@ -15,8 +15,9 @@ const dateFormat = require('dateFormat');
     let allResults = [];
     for (let i = 0; i < urls.length; i++) {
         let result = await pixelCompare.compare(
-            urls[i].replace(/^https:\/\/www/, 'https://dev'),
+            tranform(urls[i]),
             urls[i],
+            0.3,
             now);
 
         allResults.push(result);
@@ -24,17 +25,6 @@ const dateFormat = require('dateFormat');
 
     await saveResultToFile(allResults, now).catch(err => { console.log(err); });
 })();
-
-async function runAgainstAllUrls(pages) {
-    let res = await pixelCompare.compare(
-        'https://dev.beyondblue.org.au/get-support/get-immediate-support/',
-        'https://www.beyondblue.org.au/get-support/get-immediate-support/')
-        .catch(err => {
-            console.log(err);
-        });
-
-    console.log(res);
-}
 
 async function getUrls(filePath) {
     let parser = new xml2js.Parser();
