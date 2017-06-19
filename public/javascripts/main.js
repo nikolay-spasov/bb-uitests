@@ -77,7 +77,7 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.grid.pagination', 'ui.router'
         
         t.getResultSets().then(function (res) {
             ctrl.resultSets = res.data;
-            if (!$stateParams.setName) {
+            if (!$stateParams.setName && res.data) {
                 ctrl.selectedResultSet = res.data[0];
             } else {
                 ctrl.selectedResultSet = res.data.find(function(val, index) {
@@ -86,15 +86,17 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.grid.pagination', 'ui.router'
             }
         }).then(updateResultdata);
 
-        this.changeResultSet = function() {
+        ctrl.changeResultSet = function() {
             updateResultdata();
             $state.go('home', { setName: ctrl.selectedResultSet });
         };
 
         function updateResultdata() {
-            t.getData(ctrl.selectedResultSet).then(function (res) {
-                ctrl.gridOptions.data = res.data;
-            });
+            if (ctrl.selectedResultSet) {
+                t.getData(ctrl.selectedResultSet).then(function (res) {
+                    ctrl.gridOptions.data = res.data;
+                });
+            }
         }
     }])
     .controller('detailsController', ['$stateParams', function($stateParams) {
@@ -109,7 +111,7 @@ angular.module('uiTestsReportApp', ['ui.grid', 'ui.grid.pagination', 'ui.router'
         this.getData = function (resultSetName) {
             var deferred = $q.defer();
 
-            $http.get('/results/get/' + resultSetName).then(function (data) {
+            $http.get('/results/get/resultSet=?' + resultSetName).then(function (data) {
                 deferred.resolve(data);
             }).catch(function(err) {
                 deferred.reject(err);  

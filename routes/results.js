@@ -5,7 +5,7 @@ const path = require('path');
 
 const testsFolder = path.join(__dirname, '../output');
 
-router.get('/get/:resultSet', (req, res, next) => {
+router.get('/get?resultSet=:resultSet', (req, res, next) => {
   let pa = path.join(testsFolder, req.params.resultSet);
 
   fs.readFile(pa, 'utf8', (err, data) => {
@@ -20,6 +20,7 @@ router.get('/get/:resultSet', (req, res, next) => {
 router.get('/all-sets', (req, res, next) => {
     fs.readdir(testsFolder, (err, files) => {
         res.json(files);
+        console.log(files);
     });
 });
 

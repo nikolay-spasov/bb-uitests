@@ -51,7 +51,14 @@ async function getUrls(filePath) {
 
 async function saveResultToFile(result, formattedDate) {
     let json = JSON.stringify(result);
-    let filePath = path.join(__dirname, 'output', 'result-' + formattedDate + '.json')
+
+    let outputDir = path.join(__dirname, 'output');
+    if (!fs.existsSync(outputDir)){
+        fs.mkdirSync(outputDir);
+    }
+
+    let filePath = path.join(outputDir, 'result-' + formattedDate + '.json');
+    
     return new Promise((resolve, reject) => {
         fs.writeFile(filePath, json, 'utf8', (err) => {
             if (err) {
